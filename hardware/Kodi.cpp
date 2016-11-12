@@ -334,6 +334,12 @@ void CKodiNode::handleMessage(std::string& pMessage)
 						{
 							if (!root["result"]["speed"].asInt())
 								m_CurrentStatus.Status(MSTAT_PAUSED);	// useful when Domoticz restarts when media aleady paused
+							if (root["result"]["speed"].asInt() && m_CurrentStatus.Status() == MSTAT_PAUSED)
+							{
+								// Buffering when playing internet streams show 0 speed but don't trigger OnPause/OnPlay so force a refresh when speed is not 0 again
+								sMessage = "{\"jsonrpc\":\"2.0\",\"method\":\"Player.GetItem\",\"id\":1003,\"params\":{\"playerid\":" + m_CurrentStatus.PlayerID() + ",\"properties\":[\"artist\",\"album\",\"year\",\"channel\",\"showtitle\",\"season\",\"episode\",\"title\"]}}";
+								handleWrite(sMessage);
+							}
 						}
 						UpdateStatus();
 						break;
@@ -394,12 +400,12 @@ void CKodiNode::handleMessage(std::string& pMessage)
 								bCanShutdown = root["result"]["canshutdown"].asBool();
 								if (bCanShutdown) sAction = "Shutdown";
 							}
-							if (root["result"].isMember("canhibernate"))
+							if (root["result"].isMember("canhibernate") && sAction != "Nothing")
 							{
 								bCanHibernate = root["result"]["canhibernate"].asBool();
 								if (bCanHibernate) sAction = "Hibernate";
 							}
-							if (root["result"].isMember("cansuspend"))
+							if (root["result"].isMember("cansuspend")&& sAction != "Nothing")
 							{
 								bCanSuspend = root["result"]["cansuspend"].asBool();
 								if (bCanSuspend) sAction = "Suspend";
@@ -1170,7 +1176,7 @@ void CKodi::UnloadNodes()
 	m_ios.stop();	// stop the service if it is running
 	sleep_milliseconds(100);
 
-	while ((!m_pNodes.empty()) || (!m_ios.stopped()) && (iRetryCounter < 15))
+	while (((!m_pNodes.empty()) || (!m_ios.stopped())) && (iRetryCounter < 15))
 	{
 		std::vector<boost::shared_ptr<CKodiNode> >::iterator itt;
 		for (itt = m_pNodes.begin(); itt != m_pNodes.end(); ++itt)

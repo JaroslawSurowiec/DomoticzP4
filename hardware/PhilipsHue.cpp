@@ -364,7 +364,7 @@ void CPhilipsHue::InsertUpdateSwitch(const int NodeID, const _eHueLightType LTyp
 		unsigned char unitcode = 1;
 		int cmd = (bIsOn ? Limitless_LedOn : Limitless_LedOff);
 		int nvalue = 0;
-		bool tIsOn = false;
+		bool tIsOn = !(bIsOn);
 		
 		//Get current nValue if exist
 		std::vector<std::vector<std::string> > result;
@@ -451,7 +451,7 @@ void CPhilipsHue::InsertUpdateSwitch(const int NodeID, const _eHueLightType LTyp
 		int cmd = (bIsOn ? light2_sOn : light2_sOff);
 		int level = 0;
 		int nvalue = 0;
-		bool tIsOn = false;
+		bool tIsOn = !(bIsOn);
 		
 		if (LType == HLTYPE_NORMAL)
 			bIsOn ? level = 15 : level = 0;
@@ -636,12 +636,17 @@ bool CPhilipsHue::GetLights(const Json::Value &root)
 	return true;
 }
 
+// Note:
+// Some groups have only White lights,
+// We whould find a way to have these working as normal lights instead of RGBW
 bool CPhilipsHue::GetGroups(const Json::Value &root)
 {
 	//Groups (0=All)
 
 	if (root["groups"].empty())
 		return false;
+
+	_eHueLightType LType;
 
 	for (Json::Value::iterator iGroup = root["groups"].begin(); iGroup != root["groups"].end(); ++iGroup)
 	{
@@ -665,10 +670,19 @@ bool CPhilipsHue::GetGroups(const Json::Value &root)
 					tbri += 1; //hue reports 255 as 254
 				tstate.level = int((100.0f / 255.0f)*float(tbri));
 			}
+
+			LType = HLTYPE_RGBW;// HLTYPE_NORMAL;
+
 			if (!group["action"]["sat"].empty())
+			{
 				tstate.sat = group["action"]["sat"].asInt();
+				//LType = HLTYPE_RGBW;
+			}
 			if (!group["action"]["hue"].empty())
+			{
 				tstate.hue = group["action"]["hue"].asInt();
+				//LType = HLTYPE_RGBW;
+			}
 			
 			bool bDoSend = true;
 			if (m_groups.find(gID) != m_groups.end())
@@ -688,7 +702,7 @@ bool CPhilipsHue::GetGroups(const Json::Value &root)
 			if (bDoSend)
 			{
 				std::string Name = "Group " + group["name"].asString();
-				InsertUpdateSwitch(1000 + gID, HLTYPE_RGBW, tstate.on, tstate.level, tstate.sat, tstate.hue, Name, "");
+				InsertUpdateSwitch(1000 + gID, LType, tstate.on, tstate.level, tstate.sat, tstate.hue, Name, "");
 			}
 		}
 	}
@@ -732,6 +746,8 @@ bool CPhilipsHue::GetGroups(const Json::Value &root)
 	tstate.sat = 0;
 	tstate.hue = 0;
 
+	LType = HLTYPE_RGBW;// HLTYPE_NORMAL;
+
 	if (!root2["action"]["on"].empty())
 		tstate.on = root2["action"]["on"].asBool();
 	if (!root2["action"]["bri"].empty())
@@ -742,9 +758,15 @@ bool CPhilipsHue::GetGroups(const Json::Value &root)
 		tstate.level = int((100.0f / 254.0f)*float(tbri));
 	}
 	if (!root2["action"]["sat"].empty())
+	{
 		tstate.sat = root2["action"]["sat"].asInt();
+		//LType = HLTYPE_RGBW;
+	}
 	if (!root2["action"]["hue"].empty())
+	{
 		tstate.hue = root2["action"]["hue"].asInt();
+		//LType = HLTYPE_RGBW;
+	}
 
 	bool bDoSend = true;
 	int gID = 0;
@@ -765,7 +787,7 @@ bool CPhilipsHue::GetGroups(const Json::Value &root)
 	if (bDoSend)
 	{
 		std::string Name = "Group All Lights";
-		InsertUpdateSwitch(1000 + gID, HLTYPE_RGBW, tstate.on, tstate.level, tstate.sat, tstate.hue, Name,"");
+		InsertUpdateSwitch(1000 + gID, LType, tstate.on, tstate.level, tstate.sat, tstate.hue, Name,"");
 	}
 	return true;
 }
@@ -784,7 +806,9 @@ bool CPhilipsHue::GetScenes(const Json::Value &root)
 			hscene.id = iScene.key().asString();;
 			hscene.name = scene["name"].asString();
 			hscene.lastupdated = scene["lastupdated"].asString();
-
+			if (hscene.lastupdated.empty())
+				continue; //old scene/legacy scene
+			
 			//Strip some info
 			size_t tpos = hscene.name.find(" from ");
 			if (tpos != std::string::npos)

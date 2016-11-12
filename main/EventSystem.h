@@ -56,6 +56,15 @@ public:
 		std::string lastUpdate;
 	};
 
+	struct _tScenesGroups
+	{
+		unsigned long long ID;
+		std::string scenesgroupName;
+		std::string scenesgroupValue;
+		int scenesgroupType;
+		std::string lastUpdate;
+	};
+
 	CEventSystem(void);
 	~CEventSystem(void);
 
@@ -70,12 +79,14 @@ public:
 	void WWWUpdateSecurityState(int securityStatus);
 	void WWWGetItemStates(std::vector<_tDeviceStatus> &iStates);
 	void SetEnabled(const bool bEnabled);
+	void GetCurrentStates();
 private:
 	//lua_State	*m_pLUA;
 	bool m_bEnabled;
 	boost::shared_mutex m_devicestatesMutex;
 	boost::shared_mutex m_eventsMutex;
 	boost::shared_mutex m_uservariablesMutex;
+	boost::shared_mutex m_scenesgroupsMutex;
 	boost::mutex m_measurementStatesMutex;
 	boost::mutex luaMutex;
 	volatile bool m_stoprequested;
@@ -86,9 +97,9 @@ private:
 	//our thread
 	void Do_Work();
 	void ProcessMinute();
-	void GetCurrentStates();
 	void GetCurrentMeasurementStates();
 	void GetCurrentUserVariables();
+	void GetCurrentScenesGroups();
 	std::string UpdateSingleState(const unsigned long long ulDevID, const std::string &devname, const int nValue, const char* sValue, const unsigned char devType, const unsigned char subType, const _eSwitchType switchType, const std::string &lastUpdate, const unsigned char lastLevel, const std::map<std::string, std::string> & options);
 	void EvaluateEvent(const std::string &reason);
 	void EvaluateEvent(const std::string &reason, const unsigned long long varId);
@@ -108,7 +119,6 @@ private:
 	static void luaStop(lua_State *L, lua_Debug *ar);
 	std::string nValueToWording(const unsigned char dType, const unsigned char dSubType, const _eSwitchType switchtype, const unsigned char nValue, const std::string &sValue, const std::map<std::string, std::string> & options);
 	static int l_domoticz_print(lua_State* lua_state);
-	void SendEventNotification(const std::string &Subject, const std::string &Body, const std::string &ExtraData, const int Priority, const std::string &Sound);
 	void OpenURL(const std::string &URL);
 	void WriteToLog(const std::string &devNameNoQuotes, const std::string &doWhat);
 	bool ScheduleEvent(int deviceID, std::string Action, bool isScene, const std::string &eventName, int sceneType);
@@ -124,6 +134,7 @@ private:
 
 	std::map<unsigned long long, _tDeviceStatus> m_devicestates;
 	std::map<unsigned long long, _tUserVariable> m_uservariables;
+	std::map<unsigned long long, _tScenesGroups> m_scenesgroups;
 	std::map<std::string, float> m_tempValuesByName;
 	std::map<std::string, float> m_dewValuesByName;
 	std::map<std::string, float> m_rainValuesByName;

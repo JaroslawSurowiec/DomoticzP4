@@ -269,9 +269,9 @@ reply reply::stock_reply(reply::status_type status)
 
 void reply::add_header(reply *rep, const std::string &name, const std::string &value, bool replace)
 {
-	int num = rep->headers.size();
+	size_t num = rep->headers.size();
 	if (replace) {
-		for (int h = 0; h < num; h++) {
+		for (size_t h = 0; h < num; h++) {
 			if (boost::iequals(rep->headers[h].name, name)) {
 				rep->headers[h].value = value;
 				return;
@@ -284,8 +284,8 @@ void reply::add_header(reply *rep, const std::string &name, const std::string &v
 }
 
 void reply::add_header_if_absent(reply *rep, const std::string &name, const std::string &value) {
-	int num = rep->headers.size();
-	for (int h = 0; h < num; h++) {
+	size_t num = rep->headers.size();
+	for (size_t h = 0; h < num; h++) {
 		if (boost::iequals(rep->headers[h].name, name)) {
 			// is present
 			return;
@@ -303,8 +303,10 @@ void reply::set_content(reply *rep, const std::wstring & content_w) {
 	rep->content.assign(utf.get8(), strlen(utf.get8()));
 }
 
-void reply::set_content_from_file(reply *rep, const std::string & file_path) {
+bool reply::set_content_from_file(reply *rep, const std::string & file_path) {
 	std::ifstream file(file_path.c_str(), std::ios::in | std::ios::binary);
+	if (!file.is_open())
+		return false;
 	file.seekg(0, std::ios::end);
 	size_t fileSize = (size_t)file.tellg();
 	if (fileSize > 0) {
@@ -313,26 +315,29 @@ void reply::set_content_from_file(reply *rep, const std::string & file_path) {
 		file.read(&rep->content[0], rep->content.size());
 	}
 	file.close();
+	return true;
 }
 
-void reply::set_content_from_file(reply *rep, const std::string & file_path, const std::string & attachment, bool set_content_type) {
-	reply::set_content_from_file(rep, file_path);
+bool reply::set_content_from_file(reply *rep, const std::string & file_path, const std::string & attachment, bool set_content_type) {
+	if (!reply::set_content_from_file(rep, file_path))
+		return false;
 	reply::add_header_attachment(rep, attachment);
 	if (set_content_type == true) {
 		std::size_t last_dot_pos = attachment.find_last_of(".");
 		if (last_dot_pos != std::string::npos) {
 			std::string file_extension = attachment.substr(last_dot_pos + 1);
 			std::string mime_type = mime_types::extension_to_type(file_extension);
-			if ((mime_type.find("text/") >= 0) ||
-					(mime_type.find("/xml") >= 0) ||
-					(mime_type.find("/javascript") >= 0) ||
-					(mime_type.find("/json") >= 0)) {
+			if ((mime_type.find("text/") != std::string::npos) ||
+					(mime_type.find("/xml") != std::string::npos) ||
+					(mime_type.find("/javascript") != std::string::npos) ||
+					(mime_type.find("/json") != std::string::npos)) {
 				// Add charset on text content
 				mime_type += ";charset=UTF-8";
 			}
 			reply::add_header_content_type(rep, mime_type);
 		}
 	}
+	return true;
 }
 
 void reply::add_header_attachment(reply *rep, const std::string & attachment) {

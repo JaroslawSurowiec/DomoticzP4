@@ -161,13 +161,13 @@ const char *Hardware_Type_Desc(int hType)
 		{ HTYPE_DavisVantage, "Davis Vantage Weather Station USB" },
 		{ HTYPE_VOLCRAFTCO20, "Volcraft CO-20 USB air quality sensor" },
 		{ HTYPE_1WIRE, "1-Wire (System)" },
-		{ HTYPE_RaspberryBMP085, "I2C sensor BMP085/180 Temp+Baro" },
+		{ HTYPE_RaspberryBMP085, "Local I2C sensor BMP085/180 Temp+Baro" },
 		{ HTYPE_Wunderground, "Weather Underground" },
-		{ HTYPE_ForecastIO, "Forecast IO (Weather Lookup)" },
+		{ HTYPE_DarkSky, "DarkSky (Weather Lookup)" },
 		{ HTYPE_Dummy, "Dummy (Does nothing, use for virtual switches only)" },
 		{ HTYPE_Tellstick, "Tellstick" },
 		{ HTYPE_PiFace, "PiFace - Raspberry Pi IO expansion board" },
-		{ HTYPE_S0SmartMeter, "S0 Meter USB" },
+		{ HTYPE_S0SmartMeterUSB, "S0 Meter USB" },
 		{ HTYPE_OpenThermGateway, "OpenTherm Gateway USB" },
 		{ HTYPE_TeleinfoMeter, "Teleinfo EDF USB" },
 		{ HTYPE_OpenThermGatewayTCP, "OpenTherm Gateway with LAN interface" },
@@ -212,13 +212,34 @@ const char *Hardware_Type_Desc(int hType)
 		{ HTYPE_RFXtrx868, "RFXCOM - RFXtrx868 USB 868MHz Transceiver" },
 		{ HTYPE_RFLINKTCP, "RFLink Gateway with LAN interface" },
 		{ HTYPE_Comm5TCP, "Comm5 MA-5XXX with LAN interface" },
+		{ HTYPE_Comm5Serial, "Comm5 MA-4XXX/MI-XXXX Serial/USB interface" },
 		{ HTYPE_SolarEdgeAPI , "SolarEdge via Web API" },
 		{ HTYPE_CurrentCostMeter, "CurrentCost Meter USB" },
 		{ HTYPE_CurrentCostMeterLAN, "CurrentCost Meter with LAN interface" },
 		{ HTYPE_DomoticzInternal, "Domoticz Internal interface" },
 		{ HTYPE_NefitEastLAN, "Nefit Easy HTTP server over LAN interface" },
 		{ HTYPE_OpenWebNet, "MyHome OpenWebNet" },
-		{ HTYPE_RaspberryHTU21D, "I2C sensor HTU21D(F)/SI702x Humidity+Temp" },
+		{ HTYPE_RaspberryHTU21D, "Local I2C sensor HTU21D(F)/SI702x Humidity+Temp" },
+		{ HTYPE_AtagOne, "Atag One Thermostat" },
+		{ HTYPE_Sterbox, "Sterbox v2-3 PLC with LAN interface" },
+		{ HTYPE_HTTPPOLLER, "HTTP/HTTPS poller" },
+		{ HTYPE_FITBIT, "Fitbit" },
+		{ HTYPE_RAVEn, "Rainforest RAVEn USB" },
+		{ HTYPE_S0SmartMeterTCP, "S0 Meter with LAN interface" },
+		{ HTYPE_DenkoviSmartdenLan, "Denkovi Smartden with LAN interface" },
+		{ HTYPE_AccuWeather, "AccuWeather (Weather Lookup)" },
+		{ HTYPE_BleBox, "BleBox devices" },
+		{ HTYPE_Ec3kMeterTCP, "Energy Count 3000/ NETBSEM4/ La Crosse RT-10 LAN" },
+		{ HTYPE_OpenWeatherMap, "Open Weather Map" },
+		{ HTYPE_GoodweAPI, "Goodwe solar inverter via Web API" },
+		{ HTYPE_RaspberryTSL2561, "Local I2C sensor TSL2561 Illuminance" },
+		{ HTYPE_Daikin, "Daikin Airconditioning with LAN (HTTP) interface" },
+		{ HTYPE_HEOS, "HEOS by DENON" },
+		{ HTYPE_MultiFun, "MultiFun LAN" },
+		{ HTYPE_ZIBLUEUSB, "ZiBlue RFPlayer USB" },
+		{ HTYPE_ZIBLUETCP, "ZiBlue RFPlayer with LAN interface" },
+		{ HTYPE_Yeelight, "Yeelight LED" },
+
 		{ 0, NULL, NULL }
 	};
 	return findTableIDSingle1 (Table, hType);
@@ -454,6 +475,7 @@ const char *RFX_Type_Desc(const unsigned char i, const unsigned char snum)
 		{ pTypeEvohomeWater, "Heating" , "evohome" },
 		{ pTypeEvohomeRelay, "Heating" , "evohome" },
 		{ pTypeGeneralSwitch, "Light/Switch", "lightbulb" },
+		{ pTypeYeelight, "Light/Switch", "lightbulb" },
 		{ 0, NULL, NULL }
 	};
 	if (snum==1)
@@ -580,6 +602,7 @@ const char *RFX_Type_SubType_Desc(const unsigned char dType, const unsigned char
 		{ pTypeBlinds, sTypeBlindsT9, "Sunpery" },
 		{ pTypeBlinds, sTypeBlindsT10, "Dolat DLM-1" },
 		{ pTypeBlinds, sTypeBlindsT11, "ASP" },
+		{ pTypeBlinds, sTypeBlindsT12, "Confexx" },
 
 		{ pTypeSecurity1, sTypeSecX10, "X10 security" },
 		{ pTypeSecurity1, sTypeSecX10M, "X10 security motion" },
@@ -671,6 +694,7 @@ const char *RFX_Type_SubType_Desc(const unsigned char dType, const unsigned char
 		{ pTypeGeneral, sTypeZWaveThermostatFanMode, "Thermostat Fan Mode" },
 		{ pTypeGeneral, sTypeAlert, "Alert" },
 		{ pTypeGeneral, sTypeSoundLevel, "Sound Level" },
+		{ pTypeGeneral, sTypeUV, "UV" },
 		{ pTypeGeneral, sTypeDistance, "Distance" },
 		{ pTypeGeneral, sTypeCounterIncremental, "Counter Incremental" },
 		{ pTypeGeneral, sTypeKwh, "kWh" },
@@ -762,7 +786,7 @@ const char *RFX_Type_SubType_Desc(const unsigned char dType, const unsigned char
 		{ pTypeGeneralSwitch, sSwitchTypeBrel, "BrelMotor" },
 		{ pTypeGeneralSwitch, sSwitchTypeRTS, "RTS" },
 		{ pTypeGeneralSwitch, sSwitchTypeElroDB, "ElroDB" },
-		{ pTypeGeneralSwitch, sSwitchTypeAOK, "AOK" },
+		{ pTypeGeneralSwitch, sSwitchTypeDooya, "Dooya" },
 		{ pTypeGeneralSwitch, sSwitchTypeUnitec, "Unitec" },
 		{ pTypeGeneralSwitch, sSwitchTypeSelector, "Selector Switch" },
 		{ pTypeGeneralSwitch, sSwitchTypeMaclean, "Maclean" },
@@ -787,6 +811,23 @@ const char *RFX_Type_SubType_Desc(const unsigned char dType, const unsigned char
 		{ pTypeGeneralSwitch, sSwitchFriedland, "Friedland" },
 		{ pTypeGeneralSwitch, sSwitchBFT, "BFT" },
 		{ pTypeGeneralSwitch, sSwitchNovatys, "Novatys" },
+		{ pTypeGeneralSwitch, sSwitchHalemeier, "Halemeier" },
+		{ pTypeGeneralSwitch, sSwitchGaposa, "Gaposa" },
+		{ pTypeGeneralSwitch, sSwitchMiLightv1, "MiLightv1" },
+		{ pTypeGeneralSwitch, sSwitchMiLightv2, "MiLightv2" },
+		{ pTypeGeneralSwitch, sSwitchHT6P20, "HT6P20" },
+		{ pTypeYeelight, sTypeYeelightColor, "RGBW" },
+		{ pTypeYeelight, sTypeYeelightWhite, "White" },
+		{ pTypeGeneralSwitch, sSwitchTypeDoitrand, "Doitrand" },
+		{ pTypeGeneralSwitch, sSwitchTypeWarema, "Warema" },
+		{ pTypeGeneralSwitch, sSwitchTypeAnsluta, "Ansluta" },
+		{ pTypeGeneralSwitch, sSwitchTypeLivcol, "Livcol" },
+		{ pTypeGeneralSwitch, sSwitchTypeBosch, "Bosch" },
+		{ pTypeGeneralSwitch, sSwitchTypeNingbo, "Ningbo" },
+		{ pTypeGeneralSwitch, sSwitchTypeDitec, "Ditec" },
+		{ pTypeGeneralSwitch, sSwitchTypeSteffen, "Steffen" },
+		{ pTypeGeneralSwitch, sSwitchTypeAlectoSA, "AlectoSA" },
+		{ pTypeGeneralSwitch, sSwitchTypeGPIOset, "GPIOset" },
 		{  0,0,NULL }
 	};
 	return findTableID1ID2(Table, dType, sType);
@@ -911,6 +952,7 @@ const char *RFX_Type_SubType_Values(const unsigned char dType, const unsigned ch
 		{ pTypeBlinds, sTypeBlindsT9, "Status" },
 		{ pTypeBlinds, sTypeBlindsT10, "Status" },
 		{ pTypeBlinds, sTypeBlindsT11, "Status" },
+		{ pTypeBlinds, sTypeBlindsT12, "Status" },
 
 		{ pTypeSecurity1, sTypeSecX10, "Status" },
 		{ pTypeSecurity1, sTypeSecX10M, "Status" },
@@ -1001,6 +1043,7 @@ const char *RFX_Type_SubType_Values(const unsigned char dType, const unsigned ch
 		{ pTypeGeneral, sTypeZWaveThermostatFanMode, "Thermostat Fan Mode" },
 		{ pTypeGeneral, sTypeAlert, "Alert" },
 		{ pTypeGeneral, sTypeSoundLevel, "Sound Level" },
+		{ pTypeGeneral, sTypeUV, "UV,Temperature" },
 		{ pTypeGeneral, sTypeDistance, "Distance" },
 		{ pTypeGeneral, sTypeCounterIncremental, "Counter Incremental" },
 		{ pTypeGeneral, sTypeKwh, "Instant,Usage" },
@@ -1025,6 +1068,9 @@ const char *RFX_Type_SubType_Values(const unsigned char dType, const unsigned ch
 		{ pTypeLimitlessLights, sTypeLimitlessRGBW, "Status" },
 		{ pTypeLimitlessLights, sTypeLimitlessRGB, "Status" },
 		{ pTypeLimitlessLights, sTypeLimitlessWhite, "Status" },
+
+		{ pTypeYeelight, sTypeYeelightColor, "Status" },
+		{ pTypeYeelight, sTypeYeelightWhite, "Status" },
 
 		{ pTypeRFY, sTypeRFY, "Status" },
 		{ pTypeRFY, sTypeRFYext, "Status" },
@@ -1090,7 +1136,7 @@ const char *RFX_Type_SubType_Values(const unsigned char dType, const unsigned ch
 		{ pTypeGeneralSwitch, sSwitchTypeBrel, "Status" },
 		{ pTypeGeneralSwitch, sSwitchTypeRTS, "Status" },
 		{ pTypeGeneralSwitch, sSwitchTypeElroDB, "Status" },
-		{ pTypeGeneralSwitch, sSwitchTypeAOK, "Status" },
+		{ pTypeGeneralSwitch, sSwitchTypeDooya, "Status" },
 		{ pTypeGeneralSwitch, sSwitchTypeUnitec, "Status" },
 		{ pTypeGeneralSwitch, sSwitchTypeSelector, "Status" },
 		{ pTypeGeneralSwitch, sSwitchTypeMaclean, "Status" },
@@ -1149,7 +1195,7 @@ const char *ZWave_Clock_Days(const unsigned char Day)
 	};
 	return findTableIDSingle1(Table, Day);
 }
-
+/*
 const char *ZWave_Thermostat_Modes[] =
 {
 	"Off",
@@ -1169,7 +1215,7 @@ const char *ZWave_Thermostat_Modes[] =
 	"Unknown",
 	NULL
 };
-
+*/
 const char *ZWave_Thermostat_Fan_Modes[] =
 {
 	"Auto Low",
@@ -1183,15 +1229,14 @@ const char *ZWave_Thermostat_Fan_Modes[] =
 	NULL
 };
 
-int Lookup_ZWave_Thermostat_Modes(const std::string &sMode)
+int Lookup_ZWave_Thermostat_Modes(const std::vector<std::string> &Modes, const std::string &sMode)
 {
 	int ii = 0;
-	while (ZWave_Thermostat_Modes[ii]!=NULL)
+	std::vector<std::string>::const_iterator itt;
+	for (itt = Modes.begin(); itt != Modes.end(); ++itt)
 	{
-		if (ZWave_Thermostat_Modes[ii] == sMode)
-		{
+		if (*itt == sMode)
 			return ii;
-		}
 		ii++;
 	}
 	return -1;
@@ -1735,6 +1780,22 @@ void GetLightStatus(
 			break;
 		}
 		break;
+	case pTypeYeelight:
+		bHaveDimmer = true;
+		maxDimLevel = 100;
+		switch (nValue)
+		{
+		case Yeelight_LedOff:
+			lstatus = "Off";
+			break;
+		case Yeelight_LedOn:
+			lstatus = "On";
+			break;
+		case Yeelight_SetBrightnessLevel:
+			lstatus = "Set Level";
+			break;
+		}
+		break;
 	case pTypeSecurity1:
 		llevel=0;
 		switch (nValue)
@@ -1907,6 +1968,9 @@ void GetLightStatus(
 				break;
 			case rfy_sDown:
 				lstatus = "Off";
+				break;
+			case rfy_sStop:
+				lstatus = "Stop";
 				break;
 			}
 		}
@@ -2754,6 +2818,98 @@ bool GetLightCommand(
 		else
 			return false;
 		break;
+	case pTypeYeelight:
+		if (switchcmd == "Off")
+		{
+			cmd = Yeelight_LedOff;
+			return true;
+		}
+		else if (switchcmd == "On")
+		{
+			cmd = Yeelight_LedOn;
+			return true;
+		}
+		else if (switchcmd == "Set Color")
+		{
+			cmd = Yeelight_SetRGBColour;
+			return true;
+		}
+		else if (
+			(switchcmd == "Set Brightness") ||
+			(switchcmd == "Set Level")
+			)
+		{
+			cmd = Yeelight_SetBrightnessLevel;
+			return true;
+		}
+		else if (switchcmd == "Set White")
+		{
+			cmd = Yeelight_SetColorToWhite;
+			return true;
+		}
+		else if (switchcmd == "Set Full")
+		{
+			cmd = Yeelight_SetColorToWhite;
+			return true;
+		}
+		else if (switchcmd == "Set Night")
+		{
+			cmd = Yeelight_NightMode;
+			return true;
+		}
+		else if (switchcmd == "Bright Up")
+		{
+			cmd = Yeelight_SetBrightUp;
+			return true;
+		}
+		else if (switchcmd == "Bright Down")
+		{
+			cmd = Yeelight_SetBrightDown;
+			return true;
+		}
+		else if (switchcmd == "Disco Mode")
+		{
+			cmd = Yeelight_DiscoMode;
+			return true;
+		}
+		else if (switchcmd == "Disco Up")
+		{
+			cmd = Yeelight_RGBDiscoNext;
+			return true;
+		}
+		else if (switchcmd == "Disco Down")
+		{
+			cmd = Yeelight_RGBDiscoPrevious;
+			return true;
+		}
+		else if (switchcmd == "Speed Up")
+		{
+			cmd = Yeelight_DiscoSpeedFaster;
+			return true;
+		}
+		else if (switchcmd == "Speed Up Long")
+		{
+			cmd = Yeelight_DiscoSpeedFasterLong;
+			return true;
+		}
+		else if (switchcmd == "Speed Down")
+		{
+			cmd = Yeelight_DiscoSpeedSlower;
+			return true;
+		}
+		else if (switchcmd == "Warmer")
+		{
+			cmd = Yeelight_WarmWhiteIncrease;
+			return true;
+		}
+		else if (switchcmd == "Cooler")
+		{
+			cmd = Yeelight_CoolWhiteIncrease;
+			return true;
+		}
+		else
+			return false;
+		break;
 	case pTypeSecurity1:
 		if (
 			(dSubType==sTypeKD101)||
@@ -3313,12 +3469,32 @@ const char *Get_Alert_Desc(const int level)
 
 bool IsSerialDevice(const _eHardwareTypes htype)
 {
-	return (
-		(htype == HTYPE_RFXtrx315) || (htype == HTYPE_RFXtrx433) || (htype == HTYPE_RFXtrx868) ||
-		(htype == HTYPE_P1SmartMeter) || (htype == HTYPE_Rego6XX) || (htype == HTYPE_DavisVantage) || (htype == HTYPE_S0SmartMeter) || (htype == HTYPE_OpenThermGateway) ||
-		(htype == HTYPE_TeleinfoMeter) || (htype == HTYPE_OpenZWave) || (htype == HTYPE_EnOceanESP2) || (htype == HTYPE_EnOceanESP3) || (htype == HTYPE_Meteostick) ||
-		(htype == HTYPE_MySensorsUSB) || (htype == HTYPE_RFLINKUSB) || (htype == HTYPE_KMTronicUSB) || (htype == HTYPE_KMTronic433) || (htype == HTYPE_CurrentCostMeter)
-		);
+	switch (htype) {
+	case HTYPE_RFXtrx315:
+	case HTYPE_RFXtrx433:
+	case HTYPE_RFXtrx868:
+	case HTYPE_P1SmartMeter:
+	case HTYPE_Rego6XX:
+	case HTYPE_DavisVantage:
+	case HTYPE_S0SmartMeterUSB:
+	case HTYPE_OpenThermGateway:
+	case HTYPE_TeleinfoMeter:
+	case HTYPE_OpenZWave:
+	case HTYPE_EnOceanESP2:
+	case HTYPE_EnOceanESP3:
+	case HTYPE_Meteostick:
+	case HTYPE_MySensorsUSB:
+	case HTYPE_RFLINKUSB:
+	case HTYPE_ZIBLUEUSB:
+	case HTYPE_KMTronicUSB:
+	case HTYPE_KMTronic433:
+	case HTYPE_CurrentCostMeter:
+	case HTYPE_RAVEn:
+	case HTYPE_Comm5Serial:
+		return true;
+	default:
+		return false;
+	}
 }
 
 void ConvertToGeneralSwitchType(std::string &devid, int &dtype, int &subtype)
@@ -3381,10 +3557,10 @@ void ConvertToGeneralSwitchType(std::string &devid, int &dtype, int &subtype)
 		dtype = pTypeGeneralSwitch;
 		if (subtype == sTypeBlindsT5) subtype = sSwitchTypeBofu;
 		else if (subtype == sTypeBlindsT6) subtype = sSwitchTypeBrel;
-		else if (subtype == sTypeBlindsT7) subtype = sSwitchTypeAOK;
+		else if (subtype == sTypeBlindsT7) subtype = sSwitchTypeDooya;
 		else if (subtype == sTypeBlindsT8) subtype = sSwitchTypeBofu;
 		else if (subtype == sTypeBlindsT9) subtype = sSwitchTypeBrel;
-		else if (subtype == sTypeBlindsT10) subtype = sSwitchTypeAOK;
+		else if (subtype == sTypeBlindsT10) subtype = sSwitchTypeDooya;
 		std::stringstream s_strid;
 		s_strid << std::hex << strtoul(devid.c_str(), NULL, 16);
 		unsigned long deviceid = 0;
