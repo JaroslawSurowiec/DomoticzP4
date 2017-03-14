@@ -4,7 +4,6 @@
 #include "../main/Logger.h"
 #include "hardwaretypes.h"
 #include "../main/localtime_r.h"
-#include "../json/json.h"
 #include "../main/RFXtrx.h"
 #include "../main/SQLHelper.h"
 #include "../httpclient/HTTPClient.h"
@@ -328,12 +327,12 @@ bool CToonThermostat::Login()
 
 	Json::Value root;
 	Json::Reader jReader;
-	if (!jReader.parse(sResult, root))
+	bool bRet = jReader.parse(sResult, root);
+	if (!bRet)
 	{
 		_log.Log(LOG_ERROR, "ToonThermostat: Invalid data received, or invalid username/password!");
 		return false;
 	}
-
 	if (root["clientId"].empty() == true)
 	{
 		_log.Log(LOG_ERROR, "ToonThermostat: Invalid data received, or invalid username/password!");
@@ -387,7 +386,8 @@ bool CToonThermostat::Login()
 #endif
 
 	root.clear();
-	if (!jReader.parse(sResult, root))
+	bRet = jReader.parse(sResult, root);
+	if (!bRet)
 	{
 		_log.Log(LOG_ERROR, "ToonThermostat: Invalid data received!");
 		return false;
@@ -482,7 +482,8 @@ bool CToonThermostat::SwitchLight(const std::string &UUID, const int SwitchState
 
 	Json::Value root;
 	Json::Reader jReader;
-	if (!jReader.parse(sResult, root))
+	bool bRet = jReader.parse(sResult, root);
+	if (!bRet)
 	{
 		_log.Log(LOG_ERROR, "ToonThermostat: Invalid data received!");
 		return false;
@@ -525,7 +526,8 @@ bool CToonThermostat::SwitchAll(const int SwitchState)
 
 	Json::Value root;
 	Json::Reader jReader;
-	if (!jReader.parse(sResult, root))
+	bool bRet = jReader.parse(sResult, root);
+	if (!bRet)
 	{
 		_log.Log(LOG_ERROR, "ToonThermostat: Invalid data received!");
 		return false;
@@ -623,7 +625,8 @@ void CToonThermostat::GetMeterDetails()
 #endif
 
 	Json::Reader jReader;
-	if (!jReader.parse(sResult, root))
+	bool bRet = jReader.parse(sResult, root);
+	if (!bRet)
 	{
 		_log.Log(LOG_ERROR, "ToonThermostat: Invalid data received!");
 		m_bDoLogin = true;
@@ -737,7 +740,7 @@ bool CToonThermostat::ParsePowerUsage(const Json::Value &root)
 	if (
 		(m_p1power.usagecurrent != m_lastelectrausage) ||
 		(m_p1power.delivcurrent != m_lastelectradeliv) ||
-		(atime - m_lastSharedSendElectra >= 300)
+		(difftime(atime,m_lastSharedSendElectra) >= 300)
 		)
 	{
 		if ((m_p1power.powerusage1 != 0) || (m_p1power.powerusage2 != 0) || (m_p1power.powerdeliv1 != 0) || (m_p1power.powerdeliv2 != 0))
@@ -762,7 +765,7 @@ bool CToonThermostat::ParseGasUsage(const Json::Value &root)
 	//Send GAS if the value changed, or at least every 5 minutes
 	if (
 		(m_p1gas.gasusage != m_lastgasusage) ||
-		(atime - m_lastSharedSendGas >= 300)
+		(difftime(atime,m_lastSharedSendGas) >= 300)
 		)
 	{
 		if (m_p1gas.gasusage != 0)
@@ -921,7 +924,8 @@ void CToonThermostat::SetSetpoint(const int idx, const float temp)
 
 		Json::Value root;
 		Json::Reader jReader;
-		if (!jReader.parse(sResult, root))
+		bool bRet = jReader.parse(sResult, root);
+		if (!bRet)
 		{
 			_log.Log(LOG_ERROR, "ToonThermostat: Invalid data received!");
 			m_bDoLogin = true;
@@ -978,7 +982,8 @@ void CToonThermostat::SetProgramState(const int newState)
 
 	Json::Value root;
 	Json::Reader jReader;
-	if (!jReader.parse(sResult, root))
+	bool bRet = jReader.parse(sResult, root);
+	if (!bRet)
 	{
 		_log.Log(LOG_ERROR, "ToonThermostat: setProgramState request not successful, restarting..!");
 		m_bDoLogin = true;
